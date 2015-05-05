@@ -1,18 +1,31 @@
 import sys, pygame
 import math
 
-pygame.init
+class Box:
 
-
-size = width, height = 500, 500
-speed = [2, 2]
-a = 500.0
-k = 2.0
-x, y = 100, 100
-
-g = 50.0
-clock = pygame.time.Clock()
-grav = -700.0
+  def __init__(self, width = 500, height = 500, a = 500.0, k = 2.0):
+      pygame.init
+      size = width, height = 500, 500
+      speed = [2, 2]
+      a = 500.0
+      k = 2.0
+      x, y = 100, 100
+      g = 50.0
+      clock = pygame.time.Clock()
+      grav = -700.0
+      first = Player(npoint, 0)
+      first.update(dt)
+      screen = pygame.display.set_mode(size)
+      pygame.display.set_caption('ok')
+      prev_t = pygame.time.get_ticks()
+      tt = 0
+      ar = pygame.PixelArray(screen)
+      while True:
+        delta = clock.tick(50) /1000.0
+        for event in pygame.event.get():
+          if event.type == pygame.QUIT: sys.exit()
+          tt += delta
+          print "%f %f %f" % (tt, vx, x)
 
 class Vector:
   def __init__(self, x = 0.0, y = 0.0):
@@ -35,6 +48,9 @@ class Vector:
   def __mul__(self, a):
     self.xc = self.xc * a
     self.yc = self.yc * a
+  
+  def dot(self, a):
+    self.dot = self.xc * a.xc + self.yc * a.yc
 
 class Player:
   def __init__(self, pos, v):
@@ -42,8 +58,10 @@ class Player:
     self.v = v
 
   def update(self, dt):
-
     self.v = self.v
+
+
+world = Box()
 
 first = Player(npoint, 0)
 first.update(dt)
@@ -80,5 +98,4 @@ while True:
 
 pos = Vector(startx, starty)
 v = Vector(0.0, 0.0)
-first = Player(pos, v)
-first = 
+first = Player(pos, v) 
