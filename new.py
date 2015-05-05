@@ -6,7 +6,7 @@ class Box:
   def __init__(self, width = 500, height = 500, a = 500.0, k = 2.0):
       pygame.init
       size = width, height = 500, 500
-      speed = [2, 2]
+      speed = Vector(2.0,2.0)
       a = 500.0
       k = 2.0
       x, y = 100, 100
