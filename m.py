@@ -99,7 +99,5 @@ while True:
   col = min(255, int(math.sqrt(vx ** 2 + vy ** 2)) + 100)
   pygame.draw.lines(screen, (255, 0, 0), True, [(100,390),(100,430),(200,430),(200,390)], 2)
  
-  pygame.draw.circle(screen, (col-100, col-25, col), (int(x), int(y)), 20)
-  ar[int(x/10.0),int(y/10.0)] = (200,200,200)
- 
+  pygame.draw.circle(screen, (col-100, col-25, col), (int(x), int(y)), 20)        
   pygame.display.flip()
