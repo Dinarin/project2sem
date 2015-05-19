@@ -1,5 +1,9 @@
 import sys, pygame, math
 
+#pictures
+
+mode = ('edit', 'play')
+modesw = mode[1]
 
 class Vector:
     def __init__(self, x = 0.0, y = 0.0):
@@ -28,66 +32,104 @@ class Vector:
         self.dot = self.x * a.x + self.y * a.yc
 
 #class Sprite:
-    #def __init__(self, )
+ #   def __init__(self, )
+
+#class Object:
+ #   def __init__(self, pos, sprite)
+  #      self.pos = pos
+        
+
+   # class Projectile:
+
+   # class Bonus:
+
+   # class Creature:
+    #    class Enemy:
+
+#class Obstacle:
+ #   if 
+    
+
+class Circle:
+    pi = 3.141592
+
+    def __init__(self, radius, pos):
+        self.radius = radius
+        self.pos = pos
+
+    def area(self):
+        return self.radius * self.radius * Circle.pi
+
+    def setRadius(self, radius):
+        self.radius = radius
+
+    def getRadius(self):
+        return self.radius
+
+ #   def for  
 
 class Player:
-    def __init__(self, pos, v, horspeed, controls, color):
-        self.pos = pos
-        self.v = v
-        self.horspeed = horspeed
-        self.baseline = 480.0       
-        self.jumpheight = -700 
-        self.side = 1               #faced right
-        self.controls = controls
-        self.color = color
-        self.movhor = 0
+            def __init__(self, pos, v, horspeed, controls, color):
+                self.pos = pos
+                self.v = v
+                self.horspeed = horspeed
+                self.baseline = 480.0       
+                self.jumpheight = -700 
+                self.side = 1               #faced right
+                self.controls = controls
+                self.color = color
+                self.movhor = 0
+                self.circle = Circle(20, self.pos)
 
-    def update(self, screen, delta, (g, k)):
-      #  if self.side:
-        if self.pos.y <= self.baseline:
-            gt = g*delta
-        else:
-            gt = 0.0
-            self.v.y = 0.0
-        self.v.x -= delta * self.v.x * k
-        self.v.y -= delta * self.v.y * k - gt
-        self.pos.x += self.v.x * delta
-        self.pos.y += self.v.y * delta
+            def update(self, screen, delta, (g, k)):
+            #  if self.side:
+                if self.pos.y <= self.baseline:
+                    gt = g*delta
+                else:
+                    gt = 0.0
+                    self.v.y = 0.0
+                self.v.x -= delta * self.v.x * k
+                self.v.y -= delta * self.v.y * k - gt
+                self.pos.x += self.v.x * delta
+                self.pos.y += self.v.y * delta
         
-        if self.pos.x < 20:
-            if self.v.x < 0:
-                self.v.x = -self.v.x
-            self.pos.x = 20.0
-        if self.pos.y < 20:
-            if self.v.y < 0:
-                self.v.y = -self.v.y
-            self.pos.y = 20.0
-        if self.pos.x > 480:
-            if self.v.x > 0:
-                self.v.x = -self.v.x
-            self.pos.x = 480
-        if self.pos.y > 480:
-            if self.v.y > 0:
-                self.v.y = 0
-            self.pos.y = 480
+                if self.pos.x < 20:
+                    if self.v.x < 0:
+                        self.v.x = -self.v.x
+                    self.pos.x = 20.0
+                if self.pos.y < 20:
+                    if self.v.y < 0:
+                        self.v.y = -self.v.y
+                    self.pos.y = 20.0
+                if self.pos.x > 480:
+                    if self.v.x > 0:
+                        self.v.x = -self.v.x
+                    self.pos.x = 480
+                if self.pos.y > 480:
+                    if self.v.y > 0:
+                        self.v.y = 0
+                    self.pos.y = 480
 
 
-        self.draw(screen)
+                self.draw(screen)
 
-    def draw(self, screen):
-        pygame.draw.circle(screen, self.color, (int(self.pos.x), int(self.pos.y)), 20)
+            def draw(self, screen):
+                pygame.draw.circle(screen, self.color, (int(self.pos.x), int(self.pos.y)), 20)
 
 
 class Box:
 
 
     def __init__(self, width = 500, height = 500, npoint = Vector(50.0, 100.0)):
-        pygame.init   
+        pygame.init
+        pygame.font.init
 
         controlsP1 = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP]
         controlsP2 = [pygame.K_a, pygame.K_d, pygame.K_w]
         red = (204, 0, 0)
         blue = (0, 128, 255)
+        green = (24, 250, 140)
+        verdana = "/home/student/project2sem/Verdana.ttf"
 
         npoint2 = Vector(300, 100) 
         #physics const
@@ -108,7 +150,18 @@ class Box:
         self.screen = pygame.display.set_mode(size)
         pygame.display.set_caption('ok')
         ar = pygame.PixelArray(self.screen)
+
+        pygame.font.init()
+        font = pygame.font.Font(verdana, 15)
+        text = font.render("GAME", True, green)
+        self.screen.blit(text, [100, 50])
+
         self.update(first, second)
+
+  #  def draw (self, font = "comic sans MS", )
+   #     pygame.font.init()
+    #    font = pygame.font.sysFont("comic sans MS", 50, color)
+        
 
     def update(self, player1, player2):
         clock = pygame.time.Clock()
@@ -129,6 +182,9 @@ class Box:
             player1.update(self.screen, self.dt, (self.g, self.k))
             player2.update(self.screen, self.dt, (self.g, self.k))
             pygame.display.flip()
+
+#    def collide(self, player, obstacle):
+
 
     def keyboard(self, player1, player2):
         pressed = pygame.key.get_pressed()
@@ -162,4 +218,8 @@ class Box:
 
     
 
-world = Box() 
+world = Box()
+
+
+
+
