@@ -82,7 +82,7 @@ class Vector:
     
 
 class Bonus:
-    def __init__(self, pos, count):
+    def __init__(self, pos, count = 1):
         self.image = pygame.Surface((15,15))
         self.image.fill(COLOR)
         self.img = pygame.Surface((15,15))
@@ -107,7 +107,7 @@ class Player:
                 self.pos = pos
                 self.v = v
                 self.horspeed = horspeed
-                self.baseline = 480.0       
+                self.baseline = 500.0 - 16.0       
                 self.jumpheight = -300 
                 self.controls = controls
                 self.color = color
@@ -153,22 +153,22 @@ class Player:
                 self.pos.x += self.v.x * delta
                 self.pos.y += self.v.y * delta
         
-                if self.pos.x < 20:
+                if self.pos.x < 16:
                     if self.v.x < 0:
                         self.v.x = -self.v.x
-                    self.pos.x = 20.0
-                if self.pos.y < 20:
+                    self.pos.x = 16.0
+                if self.pos.y < 16:
                     if self.v.y < 0:
                         self.v.y = -self.v.y
-                    self.pos.y = 20.0
-                if self.pos.x > 480:
+                    self.pos.y = 16.0
+                if self.pos.x > 484:
                     if self.v.x > 0:
                         self.v.x = -self.v.x
-                    self.pos.x = 480
-                if self.pos.y > 480:
+                    self.pos.x = 484
+                if self.pos.y > 484:
                     if self.v.y > 0:
                         self.v.y = 0
-                    self.pos.y = 480
+                    self.pos.y = 484
 
                 self.draw(screen)
 
@@ -207,7 +207,7 @@ class Box:
         self.controlsP2 = [pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s]
         red = (204, 0, 0)
         blue = (0, 128, 255)
-        green = (24, 250, 140)
+        self.green = (200, 255, 180)
         verdana = "/home/student/project2sem/Verdana.ttf"
         npoint2 = Vector(300, 100) 
     
@@ -226,21 +226,22 @@ class Box:
         
         #screen
         self.num = 0
-        self.starlist = []
+#        self.starlist = []
         size = width, height = 500, 500
         self.screen = pygame.display.set_mode(size)
         self.image = self.screen.copy()
         self.image.fill(COLOR)
         pygame.display.set_caption('ok')
-
+        self.fix = self.screen.copy()
+        self.fix.fill(COLOR)
         pygame.font.init()
-        font = pygame.font.Font(None, 15)
-        text = font.render("GAME", True, green)
-        self.screen.blit(text, [100, 50])
+        font = pygame.font.Font(None, 30)
+        text = font.render("GAME", True, self.green)
+        self.fix.blit(text, [230, 50])
         
-        for count in range(0, 50):
-            star = Bonus((501, 501), count)
-            self.starlist.append(star)
+       # for count in range(0, 50):
+       #     star = Bonus((501, 501), count)
+       #     self.starlist.append(star)
       #  ar = pygame.PixelArray(self.image)
 
         self.update(first, second)
@@ -251,6 +252,9 @@ class Box:
         
 
     def update(self, player1, player2):
+        a = Vector(501, 501)
+        array = (501, 501)
+        star = Bonus(a)
         clock = pygame.time.Clock()
         tt = 0
         while True:
@@ -263,19 +267,30 @@ class Box:
                         sys.exit()
                     elif event.type == pygame.MOUSEMOTION:
                         if event.buttons[0]:
-                            pygame.draw.circle(self.image, (0, 0, 0), event.pos, 20)
+                            pygame.draw.circle(self.fix, (0, 0, 0), event.pos, 20)
                         elif event.buttons[2]:
-                            pygame.draw.circle(self.image, COLOR, event.pos, 20)
-                    if event.key == pygame.K_SPACE:
-                        self.starlist[self.num].pos.x = pygame.MOUSEMOTION.pos[0]
-                        self.starlist[self.num].pos.y = pygame.MOUSEMOTION.pos[1]
-                        self.num += 1
+                            pygame.draw.circle(self.fix, COLOR, event.pos, 20)
+                            if self.space:
+                       # self.starlist[self.num].pos.x = pygame.MOUSEMOTION.pos[0]
+                       # self.starlist[self.num].pos.y = pygame.MOUSEMOTION.pos[1]
+                       # self.num += 1
+                                array = event.pos
+                                V = Vector(event.pos[0], event.pos[1])
+                                star = Bonus(V)
+                                self.space = 0
 
             tt += self.dt
             print "%f %f %f %f" % (tt, player1.v.x, player1.pos.x, player1.score)
             print "     %f %f %f %f" % (tt, player2.v.x, player2.pos.x, player2.score)
-            self.image.fill((0, 25, 75))
+            pygame.font.init()
+            font = pygame.font.Font(None, 30)
+            score1 = font.render("Player 1 %f" %player1.score, True, self.green)
+            score2 = font.render("Player 2 %f" %player2.score, True, self.green)
+            self.fix.blit(score1, [0, 100])
+            self.fix.blit(score2, [250, 100])
 
+            self.image.fill((0, 25, 75))
+            self.image.blit(self.fix, (0,0))
             #static graphics go here
             self.keyboard(player1)
             self.keyboard(player2)
@@ -289,6 +304,7 @@ class Box:
 
             player1.update(self.image, self.dt, (self.g, self.k))
             player2.update(self.image, self.dt, (self.g, self.k))
+            self.image.blit(star.image, array)
             self.screen.blit(self.image, (0,0))
             pygame.display.flip()
 
@@ -314,6 +330,9 @@ class Box:
                 x = 1
         if pressed[player1.controls[3]]:
             player1.v.x = 0.0
+
+        if pressed[pygame.K_SPACE]:
+            self.space = 1
 
      #   if pressed[player2.controls[0]]:
       #      player2.side = 0
