@@ -76,9 +76,15 @@ class Vector:
    # class Creature:
     #    class Enemy:
 
-#class Obstacle:
+class Obstacle(pygame.sprite.Sprite):
 
-#    def __init__(self, color):
+    def __init__(self, pos, surface):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((50,100))
+        self.image.fill((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.pos = pos
+        surface.blit(self.image, pos)
     
 
 class Bonus:
@@ -101,8 +107,9 @@ class Bonus:
 
  #   def for  
 
-class Player:
+class Player(pygame.sprite.Sprite):
             def __init__(self, pos, v, horspeed, controls, color, anim_ar):
+                pygame.sprite.Sprite.__init__(self)
                 self.base = Vector(0.0, 1.0)
                 self.pos = pos
                 self.v = v
@@ -119,6 +126,7 @@ class Player:
                 self.image.fill(COLOR)
                 self.state = ['ground', 'left']                
                 self.image.set_colorkey(COLOR)
+                self.rect = self.image.get_rect()
                 boltAnim = []
                 for anim in anim_ar[0]:
                     boltAnim.append((anim, anim_delay))
@@ -197,9 +205,8 @@ class Player:
 
 class Box:
 
-          
-
     def __init__(self, width = 500, height = 500, npoint = Vector(50.0, 100.0)):
+       
         pygame.init
         pygame.font.init
 
@@ -209,11 +216,11 @@ class Box:
         blue = (0, 128, 255)
         self.green = (200, 255, 180)
         verdana = "/home/student/project2sem/Verdana.ttf"
-        npoint2 = Vector(300, 100) 
-    
-        
-       #physics const
-
+        npoint2 = Vector(300, 100)
+        obst= []
+        for i in range (1, 8):
+            obst[i] = (50 +50*i, 480-(30*i))
+        #physics const
         self.k = 2.0
         self.g = 1000.0
         
@@ -243,7 +250,16 @@ class Box:
        #     star = Bonus((501, 501), count)
        #     self.starlist.append(star)
       #  ar = pygame.PixelArray(self.image)
+        obst1 = Obstacle(obst[1], self.fix)
+        obst2 = Obstacle(obst[2], self.fix)
+        obst3 = Obstacle(obst[3], self.fix)
+        obst4 = Obstacle(obst[4], self.fix)
+        obst5 = Obstacle(obst[5], self.fix)
+        obst6 = Obstacle(obst[6], self.fix)
+        obst7 = Obstacle(obst[7], self.fix)
+        obst8 = Obstacle(obst[8], self.fix)
 
+      #  obst5 = Obstacle(obst5v)
         self.update(first, second)
 
   #  def draw (self, font = "comic sans MS", )
@@ -301,7 +317,7 @@ class Box:
                 if self.star[j].pos == player2.pos:
                     self.starlist[j].collect(player2)
 
-
+          #  pygame.sprite.collide_rect(player1, )
             player1.update(self.image, self.dt, (self.g, self.k))
             player2.update(self.image, self.dt, (self.g, self.k))
             self.image.blit(star.image, array)
