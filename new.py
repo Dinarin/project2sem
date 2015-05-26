@@ -1,9 +1,39 @@
-import sys, pygame, math, numpy as num
+import sys, pygame, math, pyganim, numpy as num
 
 #pictures
 
+anim_delay = 0.2
+anim_r = [('pixels/player1.png'),
+        ('pixels/player2.png'),
+        ('pixels/player3.png')]
+anim_l = [('pixels/player1l.png'),
+        ('pixels/player2l.png'),
+        ('pixels/player3l.png')]
+anim_jump_l = [('pixels/playerjl.png', 0.2)]
+anim_jump_r = [('pixels/playerj.png', 0.2)]
+anim_idle = [('pixels/player0.png', 0.2)]
+
+
+anim_r2 = [('pixels/player1a.png'),
+        ('pixels/player2a.png'),
+        ('pixels/player3a.png')]
+anim_l2 = [('pixels/player1la.png'),
+        ('pixels/player2la.png'),
+        ('pixels/player3la.png')]
+anim_jump_l2 = [('pixels/playerjla.png', 0.2)]
+anim_jump_r2 = [('pixels/playerja.png', 0.2)]
+anim_idle2 = [('pixels/player0a.png', 0.2)]
+
+starim = 'pixels/star.png'
+
+anim_p1 = [anim_r, anim_l, anim_jump_l, anim_jump_r, anim_idle]
+anim_p2 = [anim_r2, anim_l2, anim_jump_l2, anim_jump_r2, anim_idle2]
+
 mode = ('editor', 'play')
 modesw = mode[0]
+
+COLOR = (200, 200, 200)
+
 
 class Vector:
     def __init__(self, x = 0.0, y = 0.0):
@@ -29,7 +59,7 @@ class Vector:
         self.y = self.y * a
   
     def dot(self, a):
-        self.dot = self.x * a.x + self.y * a.yc
+        self.dot1 = self.x * a.x + self.y * a.y
 
 #class Sprite:
  #   def __init__(self, )
@@ -51,36 +81,65 @@ class Vector:
 #    def __init__(self, color):
     
 
-class Circle:
-    pi = 3.141592
-
-    def __init__(self, radius, pos):
-        self.radius = radius
+class Bonus:
+    def __init__(self, pos, count):
+        self.image = pygame.Surface((15,15))
+        self.image.fill(COLOR)
+        self.img = pygame.Surface((15,15))
+        self.img.blit((self.image), (0,0))
         self.pos = pos
+        self.count = count
+    def collect(self, player):
+        self.pos = (501, 501)
+        player.score += 500
+        self.image.fill(COLOR)
 
-    def area(self):
-        return self.radius * self.radius * Circle.pi
-
-    def setRadius(self, radius):
-        self.radius = radius
-
-    def getRadius(self):
-        return self.radius
+    def update(self):
+        self.image.fill(COLOR)
+        self.img = pygame.Surface((15,15))
+        self.img.blit((self.image), (0,0))
 
  #   def for  
 
 class Player:
-            def __init__(self, pos, v, horspeed, controls, color):
+            def __init__(self, pos, v, horspeed, controls, color, anim_ar):
+                self.base = Vector(0.0, 1.0)
                 self.pos = pos
                 self.v = v
                 self.horspeed = horspeed
                 self.baseline = 480.0       
-                self.jumpheight = -700 
-                self.side = 1               #faced right
+                self.jumpheight = -300 
                 self.controls = controls
                 self.color = color
                 self.movhor = 0
-                self.circle = Circle(20, self.pos)
+                self.score = 0.0
+             #  self.circle = Circle(20, self.pos)
+
+                self.image = pygame.Surface((16, 16))
+                self.image.fill(COLOR)
+                self.state = ['ground', 'left']                
+                self.image.set_colorkey(COLOR)
+                boltAnim = []
+                for anim in anim_ar[0]:
+                    boltAnim.append((anim, anim_delay))
+                self.boltAnimRight = pyganim.PygAnimation(boltAnim)
+                self.boltAnimRight.play()
+                boltAnim = []
+                for anim in anim_ar[1]:
+                    boltAnim.append((anim, anim_delay))
+                self.boltAnimLeft = pyganim.PygAnimation(boltAnim)
+                self.boltAnimLeft.play()
+                boltAnim = []
+                self.boltAnimStay = pyganim.PygAnimation(anim_ar[4])
+                self.boltAnimStay.play()
+                self.boltAnimStay.blit(self.image, (0, 0))
+                              
+                self.boltAnimJumpLeft= pyganim.PygAnimation(anim_ar[2])
+                self.boltAnimJumpLeft.play()
+                
+                self.boltAnimJumpRight= pyganim.PygAnimation(anim_ar[3])
+                self.boltAnimJumpRight.play()
+                                              
 
             def update(self, screen, delta, (g, k)):
             #  if self.side:
@@ -111,54 +170,78 @@ class Player:
                         self.v.y = 0
                     self.pos.y = 480
 
-
                 self.draw(screen)
 
             def draw(self, screen):
-                pygame.draw.circle(screen, self.color, (int(self.pos.x), int(self.pos.y)), 20)
+                if self.state[1] == 'left':
+                    self.image.fill(COLOR)
+                    if self.state[0] == 'up':
+                        self.boltAnimJumpLeft.blit(self.image, (0, 0))
+                    else:
+                        self.boltAnimLeft.blit(self.image, (0, 0))
 
+                if self.state[1] == 'right':
+                    self.image.fill(COLOR)
+                    if self.state[0] == 'up':
+                        self.boltAnimJumpRight.blit(self.image, (0, 0))
+                    else:
+                        self.boltAnimRight.blit(self.image, (0, 0))
+                if self.pos.y == self.baseline:
+                    self.v.dot(self.base)
+                    if self.v.dot1 <= 0.0:
+                        self.state[0] = 'ground'
+                        if self.v.x == 0:
+                            self.image.fill(COLOR)
+                            self.boltAnimStay.blit(self.image, (0, 0))
+                screen.blit(self.image, (self.pos.x, self.pos.y))
 
 class Box:
 
+          
 
     def __init__(self, width = 500, height = 500, npoint = Vector(50.0, 100.0)):
         pygame.init
         pygame.font.init
-        
-        controlsP1 = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP]
-        controlsP2 = [pygame.K_a, pygame.K_d, pygame.K_w]
+
+        self.controlsP1 = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]
+        self.controlsP2 = [pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s]
         red = (204, 0, 0)
         blue = (0, 128, 255)
         green = (24, 250, 140)
         verdana = "/home/student/project2sem/Verdana.ttf"
-
         npoint2 = Vector(300, 100) 
-        #physics const
+    
+        
+       #physics const
 
         self.k = 2.0
         self.g = 1000.0
         
         #player initialization
-
+    
         basev = Vector(0.0, 0.0)
         basev2 = Vector(0.0, 0.0)
-        first = Player(npoint, basev, 500.0, controlsP1, blue)
-        second = Player(npoint2, basev2, 700.0, controlsP2, red)
+        first = Player(npoint, basev, 1000.0, self.controlsP1, blue, anim_p1)
+        second = Player(npoint2, basev2, 1000.0, self.controlsP2, red, anim_p2)
         
         #screen
-
+        self.num = 0
+        self.starlist = []
         size = width, height = 500, 500
         self.screen = pygame.display.set_mode(size)
         self.image = self.screen.copy()
-        self.image.fill((200, 200, 200))
+        self.image.fill(COLOR)
         pygame.display.set_caption('ok')
 
         pygame.font.init()
         font = pygame.font.Font(None, 15)
         text = font.render("GAME", True, green)
         self.screen.blit(text, [100, 50])
-         
-        ar = pygame.PixelArray(self.image)
+        
+        for count in range(0, 50):
+            star = Bonus((501, 501), count)
+            self.starlist.append(star)
+      #  ar = pygame.PixelArray(self.image)
 
         self.update(first, second)
 
@@ -176,25 +259,32 @@ class Box:
                 if event.type == pygame.QUIT:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    if event.key in range(pygame.K_1, pygame.K_1 + len(mode)):
-                        modesw = mode[event.key - pygame.K_1]
-                    elif event.key == pygame.K_ESCAPE:
+                    if event.key == pygame.K_ESCAPE:
                         sys.exit()
-                    elif event.key in range(controlsP1):
-                        self.keyboard(player1)
-                    elif event.key in range(controlsP2):
-                        self.keyboard(player2)
-                    elif event.type == pygame.MOUSEMOTION and mode == 'editor':
+                    elif event.type == pygame.MOUSEMOTION:
                         if event.buttons[0]:
-                            pygame.draw.circle(image, (0, 0, 0), event.pos, 20)
+                            pygame.draw.circle(self.image, (0, 0, 0), event.pos, 20)
                         elif event.buttons[2]:
-                            pygame.draw.circle(image, (200, 200, 200), event.pos, 20)
+                            pygame.draw.circle(self.image, COLOR, event.pos, 20)
+                    if event.key == pygame.K_SPACE:
+                        self.starlist[self.num].pos.x = pygame.MOUSEMOTION.pos[0]
+                        self.starlist[self.num].pos.y = pygame.MOUSEMOTION.pos[1]
+                        self.num += 1
+
             tt += self.dt
-            print "%f %f %f" % (tt, player1.v.x, player1.pos.x)
-            print "     %f %f %f" % (tt, player2.v.x, player2.pos.x)
+            print "%f %f %f %f" % (tt, player1.v.x, player1.pos.x, player1.score)
+            print "     %f %f %f %f" % (tt, player2.v.x, player2.pos.x, player2.score)
             self.image.fill((0, 25, 75))
 
             #static graphics go here
+            self.keyboard(player1)
+            self.keyboard(player2)
+            
+            for j in range(0, self.num):
+                if self.starlist[j].pos == player1.pos:
+                    self.starlist[j].collect(player1)
+                if self.star[j].pos == player2.pos:
+                    self.starlist[j].collect(player2)
 
 
             player1.update(self.image, self.dt, (self.g, self.k))
@@ -209,18 +299,21 @@ class Box:
     def keyboard(self, player1):
         pressed = pygame.key.get_pressed()
         if pressed[player1.controls[0]]:
-            player1.side = 0
+            player1.state[1] = 'left'
             player1.v.x -= self.dt * player1.horspeed
         
         if pressed[player1.controls[1]]:
-            player1.side = 1
+            player1.state[1] = 'right'
             player1.v.x += self.dt * player1.horspeed
 
         if pressed[player1.controls[2]]:
             if player1.pos.y == player1.baseline:
                 player1.v.y = player1.jumpheight
+                player1.state[0] = 'up'
             else:
                 x = 1
+        if pressed[player1.controls[3]]:
+            player1.v.x = 0.0
 
      #   if pressed[player2.controls[0]]:
       #      player2.side = 0
