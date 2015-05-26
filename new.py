@@ -1,9 +1,9 @@
-import sys, pygame, math
+import sys, pygame, math, numpy as num
 
 #pictures
 
-mode = ('edit', 'play')
-modesw = mode[1]
+mode = ('editor', 'play')
+modesw = mode[0]
 
 class Vector:
     def __init__(self, x = 0.0, y = 0.0):
@@ -47,7 +47,8 @@ class Vector:
     #    class Enemy:
 
 #class Obstacle:
- #   if 
+
+#    def __init__(self, color):
     
 
 class Circle:
@@ -123,7 +124,7 @@ class Box:
     def __init__(self, width = 500, height = 500, npoint = Vector(50.0, 100.0)):
         pygame.init
         pygame.font.init
-
+        
         controlsP1 = [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP]
         controlsP2 = [pygame.K_a, pygame.K_d, pygame.K_w]
         red = (204, 0, 0)
@@ -148,13 +149,16 @@ class Box:
 
         size = width, height = 500, 500
         self.screen = pygame.display.set_mode(size)
+        self.image = self.screen.copy()
+        self.image.fill((200, 200, 200))
         pygame.display.set_caption('ok')
-        ar = pygame.PixelArray(self.screen)
 
         pygame.font.init()
-        font = pygame.font.Font(verdana, 15)
+        font = pygame.font.Font(None, 15)
         text = font.render("GAME", True, green)
         self.screen.blit(text, [100, 50])
+         
+        ar = pygame.PixelArray(self.image)
 
         self.update(first, second)
 
@@ -169,24 +173,40 @@ class Box:
         while True:
             self.dt = clock.tick(50) /1000.0
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: sys.exit()
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key in range(pygame.K_1, pygame.K_1 + len(mode)):
+                        modesw = mode[event.key - pygame.K_1]
+                    elif event.key == pygame.K_ESCAPE:
+                        sys.exit()
+                    elif event.key in range(controlsP1):
+                        self.keyboard(player1)
+                    elif event.key in range(controlsP2):
+                        self.keyboard(player2)
+                    elif event.type == pygame.MOUSEMOTION and mode == 'editor':
+                        if event.buttons[0]:
+                            pygame.draw.circle(image, (0, 0, 0), event.pos, 20)
+                        elif event.buttons[2]:
+                            pygame.draw.circle(image, (200, 200, 200), event.pos, 20)
             tt += self.dt
             print "%f %f %f" % (tt, player1.v.x, player1.pos.x)
             print "     %f %f %f" % (tt, player2.v.x, player2.pos.x)
-            self.keyboard(player1, player2)
-            self.screen.fill((0, 25, 75))
+            self.image.fill((0, 25, 75))
 
             #static graphics go here
 
 
-            player1.update(self.screen, self.dt, (self.g, self.k))
-            player2.update(self.screen, self.dt, (self.g, self.k))
+            player1.update(self.image, self.dt, (self.g, self.k))
+            player2.update(self.image, self.dt, (self.g, self.k))
+            self.screen.blit(self.image, (0,0))
             pygame.display.flip()
 
-#    def collide(self, player, obstacle):
+ #   def collide(self, player, obstacle):
+  #      if pixel
 
 
-    def keyboard(self, player1, player2):
+    def keyboard(self, player1):
         pressed = pygame.key.get_pressed()
         if pressed[player1.controls[0]]:
             player1.side = 0
@@ -202,19 +222,19 @@ class Box:
             else:
                 x = 1
 
-        if pressed[player2.controls[0]]:
-            player2.side = 0
-            player2.v.x -= self.dt * player2.horspeed
+     #   if pressed[player2.controls[0]]:
+      #      player2.side = 0
+       #     player2.v.x -= self.dt * player2.horspeed
 
-        if pressed[player2.controls[1]]:
-            player2.side = 1
-            player2.v.x += self.dt * player2.horspeed
+    #    if pressed[player2.controls[1]]:
+    #        player2.side = 1
+    #        player2.v.x += self.dt * player2.horspeed
 
-        if pressed[player2.controls[2]]:
-            if player2.pos.y == player2.baseline:
-                player2.v.y = player2.jumpheight
-            else:
-                x = 1
+    #    if pressed[player2.controls[2]]:
+    #        if player2.pos.y == player2.baseline:
+    #            player2.v.y = player2.jumpheight
+    #        else:
+    #            x = 1
 
     
 
